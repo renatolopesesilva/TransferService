@@ -1,4 +1,21 @@
-## TransferService
+### TransferService
+
+
+###### Solution Design
+
+Based on the requirements this serviceis capable to create new accounts and transfers money between accounts. All accounts are stored in memory, so each time that the service is stoped the accounts are lost. For test reasons a service that creates test account is available. More documentation is in the code.
+
+###### Technologies
+
+The following technologies are being used:
+
+- Java 8
+- Spring Boot
+- Spring MVC
+
+I choose spring boot as it is easy to deploy and also to create services, rest controllers, and so on, making the development faster.
+
+###### Deploy
 
 To initialize the service:
 
