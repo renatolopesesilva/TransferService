@@ -50,7 +50,12 @@ public class AccountService {
 	 * @return
 	 * @throws InvalidValueException
 	 */
-	public Account deposit(Account acc, Double value) throws InvalidValueException {
+	public Account deposit(String name, Double value) throws AbstractAccountException {
+
+		Account acc = findaccount(name);
+
+		validateAccounts(new String[] { name });
+
 		validateValue(value);
 
 		acc.setBalance(acc.getBalance() + value);
@@ -65,13 +70,15 @@ public class AccountService {
 	 * @return
 	 * @throws AbstractAccountException
 	 */
-	public Account withdraw(Account acc, Double value) throws AbstractAccountException {
+	public Account withdraw(String name, Double value) throws AbstractAccountException {
+
+		Account acc = findaccount(name);
+		validateAccounts(new String[] { name });
 
 		validateValue(value);
 
 		if (acc.getBalance() - value < 0) {
-			throw new AccountWithDrawException(
-					"Not possible to perform Withdraw. Not enough money." + acc.toString());
+			throw new AccountWithDrawException("Not possible to perform Withdraw. Not enough money." + acc.toString());
 		}
 
 		acc.setBalance(acc.getBalance() - value);
@@ -133,8 +140,9 @@ public class AccountService {
 	}
 
 	/**
-	 * Transfer money from one account to another. Value can't be less than 0. Both
-	 * accounts must exists. Account can't be with negative value (overdraw).
+	 * Transfer money from one account to another. Value can't be less than 0.
+	 * Both accounts must exists. Account can't be with negative value
+	 * (overdraw).
 	 * 
 	 * @param nameFrom
 	 * @param nameTo
@@ -147,19 +155,20 @@ public class AccountService {
 
 		validateAccounts(new String[] { nameFrom, nameTo });
 
-		// Remove value from an account, and check if it has enough balance, if not
+		// Remove value from an account, and check if it has enough balance, if
+		// not
 		// return an error
-		Account accFrom = withdraw(findaccount(nameFrom), value);
+		Account accFrom = withdraw(nameFrom, value);
 
 		// Add money to destination account
-		Account accTo = deposit(findaccount(nameTo), value);
+		Account accTo = deposit(nameTo, value);
 
 		StringBuilder msg = new StringBuilder();
 
 		msg.append("Transfer sucefully registered.");
 		msg.append(" | From Account : ").append(nameFrom).append(" Current Balance : EU ").append(accFrom.getBalance());
 		msg.append(" | To Account : ").append(nameTo).append(" Current Balance : EU ").append(accTo.getBalance());
-		return new JSONPObject("response",msg.toString());
+		return new JSONPObject("response", msg.toString());
 	}
 
 	/**

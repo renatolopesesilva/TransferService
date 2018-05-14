@@ -1,6 +1,7 @@
 package com.org.account.controller;
 
-import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,16 +12,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.org.account.Account;
 import com.org.account.exception.AbstractAccountException;
-import com.org.account.exception.InvalidAccountException;
 import com.org.account.service.AccountService;
 
 @RestController
 public class AccountController {
 
 	@Autowired
-	private AccountService service;
+	private AccountService accountService;
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	@ResponseBody
@@ -44,8 +43,8 @@ public class AccountController {
 	 * @return
 	 */
 	@RequestMapping(value = "/createTestAccounts", method = RequestMethod.GET, produces = "application/json")
-	public List<Account> createTestAccounts() {
-		return service.createTestData();
+	public ResponseEntity<?> createTestAccounts() {
+		return new ResponseEntity<Object>(accountService.createTestData(), HttpStatus.OK);
 	}
 
 	/**
@@ -54,8 +53,8 @@ public class AccountController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getAllAccounts", method = RequestMethod.GET, produces = "application/json")
-	public List<Account> getAllAccounts() {
-		return service.allAccount();
+	public ResponseEntity<?> getAllAccounts() {
+		return new ResponseEntity<Object>(accountService.allAccount(), HttpStatus.OK);
 	}
 
 	/**
@@ -65,8 +64,8 @@ public class AccountController {
 	 * @return
 	 */
 	@RequestMapping(value = "/accountInfo", method = RequestMethod.POST, produces = "application/json")
-	public Account getAccountInfo(@RequestParam("name") String name) {
-		return service.findaccount(name);
+	public ResponseEntity<?> getAccountInfo(@RequestParam("name") String name) {
+		return new ResponseEntity<Object>(accountService.findaccount(name), HttpStatus.OK);
 	}
 
 	/**
@@ -78,9 +77,9 @@ public class AccountController {
 	 * @throws AbstractAccountException
 	 */
 	@RequestMapping(value = "/newAccount", method = RequestMethod.POST, produces = "application/json")
-	public Account newAccount(@RequestParam("name") String name, @RequestParam("initialBalance") Double initialBalance)
-			throws AbstractAccountException {
-		return this.service.createNewAccount(name, initialBalance);
+	public ResponseEntity<?> newAccount(@RequestParam("name") String name,
+			@RequestParam("initialBalance") Double initialBalance) throws AbstractAccountException {
+		return new ResponseEntity<Object>(this.accountService.createNewAccount(name, initialBalance), HttpStatus.OK);
 	}
 
 	/**
@@ -93,15 +92,9 @@ public class AccountController {
 	 * @throws AbstractAccountException
 	 */
 	@RequestMapping(value = "/deposit", method = RequestMethod.POST, produces = "application/json")
-	public Account deposit(@RequestParam("name") String name, @RequestParam("value") Double value)
+	public ResponseEntity<?> deposit(@RequestParam("name") String name, @RequestParam("value") Double value)
 			throws AbstractAccountException {
-
-		Account acc = service.findaccount(name);
-		if (acc != null) {
-			return this.service.deposit(acc, value);
-		} else {
-			throw new InvalidAccountException("Account does not exists " + acc);
-		}
+		return new ResponseEntity<Object>(this.accountService.deposit(name, value), HttpStatus.OK);
 	}
 
 	/**
@@ -114,14 +107,10 @@ public class AccountController {
 	 * @throws AbstractAccountException
 	 */
 	@RequestMapping(value = "/withdraw", method = RequestMethod.POST, produces = "application/json")
-	public Account withdraw(@RequestParam("name") String name, @RequestParam("value") Double value)
+	public ResponseEntity<?> withdraw(@RequestParam("name") String name, @RequestParam("value") Double value)
 			throws AbstractAccountException {
-		Account acc = service.findaccount(name);
-		if (acc != null) {
-			return this.service.withdraw(acc, value);
-		} else {
-			throw new InvalidAccountException("Account does not exists " + acc);
-		}
+		return new ResponseEntity<Object>(this.accountService.withdraw(name, value), HttpStatus.OK);
+
 	}
 
 	/**
@@ -134,9 +123,9 @@ public class AccountController {
 	 * @throws AbstractAccountException
 	 */
 	@RequestMapping(value = "/transfer", method = RequestMethod.POST, produces = "application/json")
-	public ResponseEntity transfer(@RequestParam("from") String from, @RequestParam("to") String to,
+	public ResponseEntity<?> transfer(@RequestParam("from") String from, @RequestParam("to") String to,
 			@RequestParam("value") Double value) throws AbstractAccountException {
-		return new ResponseEntity<Object>(this.service.transfer(from, to, value), HttpStatus.OK);
+		return new ResponseEntity<Object>(this.accountService.transfer(from, to, value), HttpStatus.OK);
 	}
 
 }
